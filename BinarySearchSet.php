@@ -172,7 +172,7 @@ class BinarySearchSet implements SetInterface {
      * @return SetInterface a new set that contains the union of the two sets.
      */
     public function union(SetInterface $otherSet) {
-        $tmp = new BinarySearchSet($otherSet);
+        $tmp = clone $otherSet;
         for ($this->data->rewind(); $this->data->valid(); $this->data->next()) {
             $tmp->add($this->data->current());
         }
@@ -236,6 +236,7 @@ class BinarySearchSet implements SetInterface {
      * @param mixed $item the needle to search for
      * @return int returns the position of the item, if item is not in the list,
      * returns signal that gives location where it should be inserted
+     * @throws InvalidArgumentException only ComarableInterface|string|int|float allowed
      */
     private function find($item) {
         $low = 0;
@@ -247,15 +248,17 @@ class BinarySearchSet implements SetInterface {
 
             if ($item instanceof ComparableInterface) {
                 $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? $item->compareTo($tmp) : $item->compareToIgnoreCase($tmp);
-            } elseif (is_string($item)) {
-                $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? strcasecmp($item, $tmp) : strcmp($item, $tmp);
-            } elseif(is_int($item)) {
-                if($item < $tmp) {
+            } elseif (is_int($item) || is_float($item)) {
+                if ($item < $tmp) {
                     return -1;
-                } elseif($item > $tmp) {
+                } elseif ($item > $tmp) {
                     return 1;
                 }
                 return 0;
+            } elseif (is_string($item)) {
+                $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? strcasecmp($item, $tmp) : strcmp($item, $tmp);
+            } else {
+                throw \InvalidArgumentException('BinarySearch::find only accepts ComarableInterface|string|int|float, '.gettype($item) . ' given.');
             }
 
             if ($result == 0) //item has been found, return its location
