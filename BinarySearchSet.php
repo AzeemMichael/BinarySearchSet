@@ -2,7 +2,7 @@
 
 namespace AppBundle\Utils;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * A collection that contains no duplicate elements. More formally, sets contain no
@@ -25,8 +25,8 @@ class BinarySearchSet implements SetInterface {
     private $mode;
 
     /**
-     * The class constructor
-     * @param array|ArrayCollection|SplDoublyLinkedList $collection
+     * @param null $collection
+     * @throws \InvalidArgumentException
      */
     public function __construct($collection = null) {
         if ($collection !== null) {
@@ -35,10 +35,12 @@ class BinarySearchSet implements SetInterface {
                 for($collection->rewind(); $collection->valid(); $collection->next()) {
                     $this->add($collection->current());
                 }
-            } elseif (is_array($collection) || $collection instanceof ArrayCollection) {
+            } elseif (is_array($collection) || $collection instanceof Collection) {
                 foreach ($collection as $element) {
                     $this->add($element);
                 }
+            } else {
+                throw new \InvalidArgumentException('Unsupported argument supplied for BinarySearchSet::__constructor(). Expected array|Collection|SplDoublyLinkedList but found '. (is_object($collection)? get_class($collection) : gettype($collection)));
             }
         } else {
             $this->data = new \SplDoublyLinkedList();
@@ -236,7 +238,7 @@ class BinarySearchSet implements SetInterface {
      * @param mixed $item the needle to search for
      * @return int returns the position of the item, if item is not in the list,
      * returns signal that gives location where it should be inserted
-     * @throws InvalidArgumentException only ComarableInterface|string|int|float allowed
+     * @throws \InvalidArgumentException only ComarableInterface|string|int|float allowed
      */
     private function find($item) {
         $low = 0;
@@ -250,15 +252,16 @@ class BinarySearchSet implements SetInterface {
                 $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? $item->compareTo($tmp) : $item->compareToIgnoreCase($tmp);
             } elseif (is_int($item) || is_float($item)) {
                 if ($item < $tmp) {
-                    return -1;
+                    $result = -1;
                 } elseif ($item > $tmp) {
-                    return 1;
+                    $result = 1;
+                } else {
+                    $result = 0;
                 }
-                return 0;
             } elseif (is_string($item)) {
                 $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? strcasecmp($item, $tmp) : strcmp($item, $tmp);
             } else {
-                throw \InvalidArgumentException('BinarySearch::find only accepts ComarableInterface|string|int|float, '.gettype($item) . ' given.');
+                throw new \InvalidArgumentException('BinarySearch::find only accepts ComarableInterface|string|int|float, '.gettype($item) . ' given.');
             }
 
             if ($result == 0) //item has been found, return its location
