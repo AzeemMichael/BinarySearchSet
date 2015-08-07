@@ -233,7 +233,7 @@ class BinarySearchSet implements SetInterface {
 
     /**
      * Performs binary search on collection. If item is not in the list, it returns a signal that gives the
-     * location where the ModuleTerm should be inserted into the list.
+     * location where the item should be inserted into the list.
      * @param mixed $item the haystack to be search
      * @param mixed $item the needle to search for
      * @return int returns the position of the item, if item is not in the list,
