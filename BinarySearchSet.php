@@ -1,16 +1,12 @@
 <?php
 
-namespace AppBundle\Utils;
-
-use Doctrine\Common\Collections\Collection;
-
 /**
  * A collection that contains no duplicate elements. More formally, sets contain no
  * pair of elements $e1 and $e2 such that $e1->equals($e2), and at most one null element.
  * As implied by its name, this class models the mathematical set abstraction.
  */
-class BinarySearchSet implements SetInterface {
-
+class BinarySearchSet implements SetInterface
+{
     const COMPARABLE_MODE_CASE_INSENSITIVE = 0;
     const COMPARABLE_MODE_CASE_SENSITIVE   = 1;
 
@@ -28,37 +24,37 @@ class BinarySearchSet implements SetInterface {
      * @param null $collection
      * @throws \InvalidArgumentException
      */
-    public function __construct($collection = null) {
+    public function __construct($collection = null)
+    {
+        $this->data = new \SplDoublyLinkedList();
+
         if ($collection !== null) {
-            $this->data = new \SplDoublyLinkedList();
             if ($collection instanceof \SplDoublyLinkedList) {
-                for($collection->rewind(); $collection->valid(); $collection->next()) {
+                for($collection->rewind(); $collection->valid(); $collection->next())
                     $this->add($collection->current());
-                }
-            } elseif (is_array($collection) || $collection instanceof Collection) {
-                foreach ($collection as $element) {
-                    $this->add($element);
-                }
+            } elseif (is_array($collection)) {
+                foreach ($collection as $element) $this->add($element);
             } else {
-                throw new \InvalidArgumentException('Unsupported argument supplied for BinarySearchSet::__constructor(). Expected array|Collection|SplDoublyLinkedList but found '. (is_object($collection)? get_class($collection) : gettype($collection)));
+                throw new \InvalidArgumentException('Unsupported argument supplied for BinarySearchSet::__constructor(). Expected array|SplDoublyLinkedList but found '. (is_object($collection)? get_class($collection) : gettype($collection)));
             }
-        } else {
-            $this->data = new \SplDoublyLinkedList();
         }
+
         $this->mode = self::COMPARABLE_MODE_CASE_INSENSITIVE;
     }
 
     /**
-     * The class destructor to prevent memory leak
+     * The class destructor
      */
-    public function __destructor() {
+    public function __destructor()
+    {
         unset($this);
     }
 
     /**
      * The copy constructor
      */
-    public function __clone() {
+    public function __clone()
+    {
         $this->data = clone $this->data;
     }
 
@@ -66,26 +62,28 @@ class BinarySearchSet implements SetInterface {
      * Return a string representation of this set.
      * @return string A string that contains the contents of the set.
      */
-    public function __toString() {
-        return json_encode($this->data);
-        // $result = '(';
-        // for($this->data->rewind(); $this->data->valid(); $this->data->next()) {
-        //     $result .= "{$this->data->current()} ";
-        // }
-        // return $result .= ')';
+    public function __toString()
+    {
+        $result = '(';
+        for($this->data->rewind(); $this->data->valid(); $this->data->next()) {
+            $result .= "{$this->data->current()} ";
+        }
+        return $result .= ')';
     }
 
     /**
      * Remove all the values from this collection so that it becomes empty.
      */
-    public function clear() {
+    public function clear()
+    {
         $this->data = new \SplDoublyLinkedList();
     }
 
     /**
      * @return int the number of objects in this collection
      */
-    public function count() {
+    public function count()
+    {
         return $this->data->count();
     }
 
@@ -93,7 +91,8 @@ class BinarySearchSet implements SetInterface {
      * If this collection is empty, return true otherwise return false.
      * @return boolean A boolean indicating if this collection is or is not empty.
      */
-    public function isEmpty() {
+    public function isEmpty()
+    {
         return $this->data->isEmpty();
     }
 
@@ -102,7 +101,8 @@ class BinarySearchSet implements SetInterface {
      * @param mixed $element The value being searched for in this collection.
      * @return boolean A boolean indicating if this collection contains the value.
      */
-    public function contains($element) {
+    public function contains($element)
+    {
         return $this->find($element) >= 0;
     }
 
@@ -112,7 +112,8 @@ class BinarySearchSet implements SetInterface {
      * @param mixed $element value to be removed from the set
      * @return boolean true if the value is removed, false if it is not removed.
      */
-    public function remove($element) {
+    public function remove($element)
+    {
         $foundAt = $this->find($element);
         if ($foundAt >= 0) {
             $this->data->offsetUnset($foundAt);
@@ -125,7 +126,8 @@ class BinarySearchSet implements SetInterface {
      * Create and return an iterator for this collection.
      * @return Iterator an iterator for this collection.
      */
-    public function iterator() {
+    public function iterator()
+    {
         return new BinarySearchIterator($this->data);
     }
 
@@ -134,7 +136,8 @@ class BinarySearchSet implements SetInterface {
      * @param mixed $element the object being added to the set
      * @return boolean true if the object is added, false if it is not added.
      */
-    public function add($element) {
+    public function add($element)
+    {
         $foundAt = $this->find($element);
         if ($foundAt < 0) { // item not in list
             $pos = -$foundAt - 1; //position where item should be inserted
@@ -149,7 +152,8 @@ class BinarySearchSet implements SetInterface {
      * @param SetInterface the set that is being compared to this set.
      * @return boolean true if the two sets have the same contents, false otherwise.
      */
-    public function equals(SetInterface $otherSet) {
+    public function equals(SetInterface $otherSet)
+    {
         if ($otherSet === $this) {
             return true;
         }
@@ -173,7 +177,8 @@ class BinarySearchSet implements SetInterface {
      * @param SetInterface the set whose contents are being added to this set to form the union.
      * @return SetInterface a new set that contains the union of the two sets.
      */
-    public function union(SetInterface $otherSet) {
+    public function union(SetInterface $otherSet)
+    {
         $tmp = clone $otherSet;
         for ($this->data->rewind(); $this->data->valid(); $this->data->next()) {
             $tmp->add($this->data->current());
@@ -187,7 +192,8 @@ class BinarySearchSet implements SetInterface {
      * @param SetInterface the set whose contents are being intersected with this set.
      * @return SetInterface a new set that contains the intersection of the two sets.
      */
-    public function intersection(SetInterface $otherSet) {
+    public function intersection(SetInterface $otherSet)
+    {
         $tmp = new BinarySearchSet();
         for ($this->data->rewind(); $this->data->valid(); $this->data->next()) {
             $hold = $this->data->current();
@@ -205,7 +211,8 @@ class BinarySearchSet implements SetInterface {
      * @param SetInterface $otherSet the set being used to form the difference with this set.
      * @return SetInterface a new set that contains the difference of the two sets.
      */
-    public function difference(SetInterface $otherSet) {
+    public function difference(SetInterface $otherSet)
+    {
         $tmp = new BinarySearchSet();
         for ($this->data->rewind(); $this->data->valid(); $this->data->next()) {
             $hold = $this->data->current();
@@ -221,7 +228,8 @@ class BinarySearchSet implements SetInterface {
      * @param SetInterface the set that is being tested.
      * @return boolean true if the given set is a subset of this set, false otherwise.
      */
-    public function hasSubset(SetInterface $otherSet) {
+    public function hasSubset(SetInterface $otherSet)
+    {
         for ($otherSet->rewind(); $otherSet->valid(); $otherSet->next()) {
             $hold = $otherSet->current();
             if (!$this->contains($hold)) {
@@ -240,8 +248,9 @@ class BinarySearchSet implements SetInterface {
      * returns signal that gives location where it should be inserted
      * @throws \InvalidArgumentException only ComarableInterface|string|int|float allowed
      */
-    private function find($item) {
-        $low = 0;
+    private function find($item)
+    {
+        $low  = 0;
         $high = $this->data->count() - 1;
 
         while ($low <= $high) {
@@ -251,13 +260,9 @@ class BinarySearchSet implements SetInterface {
             if ($item instanceof ComparableInterface) {
                 $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? $item->compareTo($tmp) : $item->compareToIgnoreCase($tmp);
             } elseif (is_int($item) || is_float($item)) {
-                if ($item < $tmp) {
-                    $result = -1;
-                } elseif ($item > $tmp) {
-                    $result = 1;
-                } else {
-                    $result = 0;
-                }
+                if ($item < $tmp) $result = -1;
+                elseif ($item > $tmp) $result = 1;
+                else $result = 0;
             } elseif (is_string($item)) {
                 $result = $this->getComparableMode() == self::COMPARABLE_MODE_CASE_SENSITIVE ? strcasecmp($item, $tmp) : strcmp($item, $tmp);
             } else {
@@ -285,15 +290,16 @@ class BinarySearchSet implements SetInterface {
      * The default mode is COMPARABLE_MODE_CASE_INSENSITIVE
      * @param bool $mode
      */
-    public function setComparableMode($mode) {
+    public function setComparableMode($mode)
+    {
         $this->mode = $mode;
     }
 
     /**
      * @return bool
      */
-    public function getComparableMode() {
+    public function getComparableMode()
+    {
         return $this->mode;
     }
-
 }

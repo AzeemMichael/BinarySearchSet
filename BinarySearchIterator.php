@@ -1,9 +1,7 @@
 <?php
 
-namespace AppBundle\Utils;
-
-class BinarySearchIterator implements \Iterator {
-
+class BinarySearchIterator implements \Iterator
+{
     /**
      * @var \SplDoublyLinkedList
      */
@@ -12,43 +10,48 @@ class BinarySearchIterator implements \Iterator {
     /**
      * @param \SplDoublyLinkedList $data
      */
-    public function __construct(\SplDoublyLinkedList $data) {
+    public function __construct(\SplDoublyLinkedList $data)
+    {
         $this->data = $data;
     }
 
     /**
      *
      */
-    public function rewind() {
+    public function rewind()
+    {
         return $this->data->rewind();
     }
 
     /**
      * @return mixed
      */
-    public function current() {
+    public function current()
+    {
         return $this->data->current();
     }
 
     /**
      * @return mixed
      */
-    public function key() {
+    public function key()
+    {
         return $this->data->key();
     }
 
     /**
      *
      */
-    public function next() {
+    public function next()
+    {
         return $this->data->next();
     }
 
     /**
      * @return bool
      */
-    public function valid() {
+    public function valid()
+    {
         return $this->data->valid();
     }
-
 }
