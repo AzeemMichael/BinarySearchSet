@@ -5,14 +5,17 @@
 ```
 require_once 'autoload.php';
 
-class Season implements ComparableInterface {
+class Season implements ComparableInterface 
+{
     private $name;
 
-    public function __construct($name) {
+    public function __construct($name) 
+    {
         $this->name = $name;
     }
 
-    public function compareTo(ComparableInterface $o) {
+    public function compareTo(ComparableInterface $o) 
+    {
         $seasons = ['summer', 'fall', 'winter', 'spring'];
         $pos     = array_search(strtolower($this->name), $seasons);
         $oPos    = array_search(strtolower($o->name), $seasons);
@@ -22,11 +25,13 @@ class Season implements ComparableInterface {
         else return 0;
     }
 
-    public function compareToIgnoreCase(ComparableInterface $o) {
+    public function compareToIgnoreCase(ComparableInterface $o) 
+    {
         return $this->compareTo($o);
     }
 
-    public function __toString() {
+    public function __toString() 
+    {
         return $this->name;
     }
 }
