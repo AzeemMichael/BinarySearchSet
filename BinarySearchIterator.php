@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @author Azeem Michael
+ */
 class BinarySearchIterator implements \Iterator
 {
     /**
