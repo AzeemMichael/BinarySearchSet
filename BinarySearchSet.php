@@ -2,7 +2,7 @@
 
 /**
  * A collection that contains no duplicate elements. More formally, sets contain no
- * pair of elements $e1 and $e2 such that $e1->equals($e2), and at most one null element.
+ * pair of elements $e1 and $e2 such that $e1->equals($e2).
  * As implied by its name, this class models the mathematical set abstraction.
  * @author Azeem Michael
  */
