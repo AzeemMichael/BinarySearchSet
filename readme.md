@@ -1,4 +1,5 @@
-A collection that contains no duplicate elements. More formally, sets contain no pair of elements $e1 and $e2 such that $e1->equals($e2). As implied by its name, this class models the mathematical set abstraction.
+A collection that contains no duplicate elements. More formally, sets contain no pair of elements $e1 and $e2 such 
+that $e1->equals($e2). As implied by its name, this class models the mathematical set abstraction.
 
 ### Simple use case:
 
@@ -42,5 +43,5 @@ $set->add(new Season('summer'));
 $set->add(new Season('spring'));
 $set->add(new Season('winter'));
 
-echo $set.PHP_EOL;
+echo $set.PHP_EOL; // outputs ordered data i.e.: summer, fall, winter, spring
 ```
